@@ -4,6 +4,7 @@ const postModel = new Schema(
 	{
 		title: { required: true, type: String },
 		content: { required: true, type: String },
+		thumbnail: { type: String },
 		status: {
 			type: String,
 			enum: ["draft", "published", "archived"],
