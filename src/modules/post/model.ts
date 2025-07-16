@@ -5,6 +5,20 @@ const postModel = new Schema(
 		title: { required: true, type: String },
 		content: { required: true, type: String },
 		thumbnail: { type: String },
+		category: {
+			type: String,
+			enum: [
+				"PVI",
+				"AEM Author",
+				"AEM Target",
+				"AEM Launch",
+				"Design",
+				"TI",
+				"RH",
+				"VTEX",
+			],
+			required: true,
+		},
 		status: {
 			type: String,
 			enum: ["draft", "published", "archived"],

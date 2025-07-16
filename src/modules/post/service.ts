@@ -4,7 +4,8 @@ import { Status } from "../../types/Status";
 
 export async function createPost(req: Request, res: Response) {
 	try {
-		const { title, content, status, tags, author, thumbnail } = req.body;
+		const { title, content, status, tags, author, thumbnail, category } =
+			req.body;
 
 		const postExist = await postSchema.findOne({ title });
 
@@ -12,8 +13,11 @@ export async function createPost(req: Request, res: Response) {
 			throw new Error("Post já existe no sistema");
 		}
 
-		if (!Object.values(Status).includes(status)) {
-			throw new Error("Status inválido");
+		if (
+			!Object.values(Status).includes(status) ||
+			!Object.values(Category).includes(category)
+		) {
+			throw new Error("Categoria ou status inválido");
 		}
 
 		const post = await postSchema.create({
@@ -23,6 +27,7 @@ export async function createPost(req: Request, res: Response) {
 			tags,
 			author,
 			thumbnail,
+			category,
 		});
 		return res.status(200).json(post);
 	} catch (error) {
@@ -65,7 +70,7 @@ export async function getPostById(req: Request, res: Response) {
 export async function updatePostById(req: Request, res: Response) {
 	try {
 		const { id } = req.params;
-		const { title, content, status, tags, thumbnail } = req.body;
+		const { title, content, status, tags, thumbnail, category } = req.body;
 
 		const postExist = await postSchema.findById(id);
 
@@ -73,8 +78,11 @@ export async function updatePostById(req: Request, res: Response) {
 			throw new Error("Post não localizado no sistema");
 		}
 
-		if (!Object.values(Status).includes(status)) {
-			throw new Error("Status inválido");
+		if (
+			!Object.values(Status).includes(status) ||
+			!Object.values(Category).includes(category)
+		) {
+			throw new Error("Categoria ou status inválido");
 		}
 
 		const post = await postSchema.findByIdAndUpdate(id, {
@@ -83,6 +91,7 @@ export async function updatePostById(req: Request, res: Response) {
 			status,
 			tags,
 			thumbnail,
+			category,
 		});
 
 		return res.status(201).json(post);
