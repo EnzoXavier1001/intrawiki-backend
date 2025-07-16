@@ -9,7 +9,7 @@ export function authenticateUser(
 ) {
 	const authHeader = req.headers["authorization"];
 
-	const secret = process.env.secret!;
+	const secret = process.env.SECRET!;
 	const token = authHeader && authHeader.split(" ")[1];
 
 	if (!token) {
