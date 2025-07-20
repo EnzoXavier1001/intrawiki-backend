@@ -4,6 +4,7 @@ import {
 	deletePostById,
 	getAllPosts,
 	getPostById,
+	searchPostsByUserId,
 	updatePostById,
 } from "./service";
 
@@ -26,5 +27,9 @@ export class postController {
 
 	async delete(req: Request, res: Response) {
 		await deletePostById(req, res);
+	}
+
+	async searchPostsByUser(req: Request, res: Response) {
+		await searchPostsByUserId(req, res);
 	}
 }

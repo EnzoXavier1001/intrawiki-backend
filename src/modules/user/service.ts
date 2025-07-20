@@ -5,8 +5,17 @@ import jwt from "jsonwebtoken";
 
 export async function createUser(req: Request, res: Response) {
 	try {
-		const { email, name, password, hobbies, biography, linkedin, avatarUrl } =
-			req.body;
+		const {
+			email,
+			name,
+			password,
+			hobbies,
+			biography,
+			linkedin,
+			avatarUrl,
+			skills,
+			github,
+		} = req.body;
 
 		const userExist = await userSchema.findOne({ email });
 
@@ -23,7 +32,9 @@ export async function createUser(req: Request, res: Response) {
 			hobbies,
 			biography,
 			linkedin,
+			github,
 			avatarUrl,
+			skills,
 		});
 
 		res.status(200).json(user);
@@ -77,7 +88,7 @@ export async function authUser(req: Request, res: Response) {
 				id: userExist._id,
 			},
 			secret,
-			{ expiresIn: "4h" },
+			// { expiresIn: "4h" },
 		);
 
 		res.status(200).json({ msg: "Autenticação realizada com sucesso", token });

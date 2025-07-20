@@ -7,6 +7,7 @@ const UserController = new postController();
 const router = Router();
 
 router.get("/", authenticateUser, (req, res) => UserController.show(req, res));
+router.get("/search", (req, res) => UserController.searchPostsByUser(req, res));
 router.get("/:id", authenticateUser, (req, res) =>
 	UserController.get(req, res),
 );

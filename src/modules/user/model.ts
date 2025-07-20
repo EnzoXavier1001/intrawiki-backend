@@ -25,19 +25,24 @@ const allowedHobbies = [
 	"Viajar",
 ];
 
-const userModel = new Schema({
-	email: { required: true, type: String },
-	name: { required: true, type: String },
-	password: { required: true, type: String },
-	biography: { type: String },
-	avatarUrl: { type: String },
-	linkedin: { type: String },
-	hobbies: [
-		{
-			type: String,
-			enum: allowedHobbies,
-		},
-	],
-});
+const userModel = new Schema(
+	{
+		email: { required: true, type: String },
+		name: { required: true, type: String },
+		password: { required: true, type: String },
+		biography: { required: true, type: String },
+		avatarUrl: { type: String },
+		linkedin: { type: String },
+		github: { type: String },
+		skills: [{ type: String }],
+		hobbies: [
+			{
+				type: String,
+				enum: allowedHobbies,
+			},
+		],
+	},
+	{ timestamps: true },
+);
 
 export const userSchema = model("User", userModel);

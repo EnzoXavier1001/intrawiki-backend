@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { postSchema } from "./model";
 import { Status } from "../../types/Status";
+import { Category } from "../../types/Category";
 
 export async function createPost(req: Request, res: Response) {
 	try {
@@ -12,6 +13,8 @@ export async function createPost(req: Request, res: Response) {
 		if (postExist) {
 			throw new Error("Post já existe no sistema");
 		}
+
+		console.log(category);
 
 		if (
 			!Object.values(Status).includes(status) ||
@@ -39,7 +42,7 @@ export async function createPost(req: Request, res: Response) {
 
 export async function getAllPosts(res: Response) {
 	try {
-		const posts = await postSchema.find({ status: { $ne: "draft" } });
+		const posts = await postSchema.find();
 		return res.status(200).json(posts);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Erro inesperado";
@@ -78,13 +81,6 @@ export async function updatePostById(req: Request, res: Response) {
 			throw new Error("Post não localizado no sistema");
 		}
 
-		if (
-			!Object.values(Status).includes(status) ||
-			!Object.values(Category).includes(category)
-		) {
-			throw new Error("Categoria ou status inválido");
-		}
-
 		const post = await postSchema.findByIdAndUpdate(id, {
 			title,
 			content,
@@ -118,6 +114,32 @@ export async function deletePostById(req: Request, res: Response) {
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Erro inesperado";
 
+		return res.status(500).json({ status: "error", message });
+	}
+}
+
+export async function searchPostsByUserId(req: Request, res: Response) {
+	try {
+		const { id } = req.query;
+
+		if (!id) {
+			return res
+				.status(400)
+				.json({ status: "error", message: "ID do usuário não fornecido" });
+		}
+
+		const posts = await postSchema.find({ author: id }).populate("author");
+
+		if (!posts || posts.length === 0) {
+			return res.status(404).json({
+				status: "error",
+				message: "Nenhum post encontrado para esse usuário",
+			});
+		}
+
+		return res.status(200).json(posts);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "Erro inesperado";
 		return res.status(500).json({ status: "error", message });
 	}
 }
