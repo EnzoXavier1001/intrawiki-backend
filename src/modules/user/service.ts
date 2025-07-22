@@ -15,6 +15,7 @@ export async function createUser(req: Request, res: Response) {
 			avatarUrl,
 			skills,
 			github,
+			badge,
 		} = req.body;
 
 		const userExist = await userSchema.findOne({ email });
@@ -35,12 +36,75 @@ export async function createUser(req: Request, res: Response) {
 			github,
 			avatarUrl,
 			skills,
+			badge,
 		});
 
 		res.status(200).json(user);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Erro inesperado";
 
+		res.status(500).json({ status: "error", message });
+	}
+}
+
+import type { Request, Response } from "express";
+import { hash } from "bcrypt";
+import { userSchema } from "./model";
+
+export async function updateUser(req: Request, res: Response) {
+	try {
+		const { id } = req.params;
+		const {
+			name,
+			email,
+			password,
+			biography,
+			linkedin,
+			github,
+			avatarUrl,
+			skills,
+			hobbies,
+			badges, // badges que podem ser adicionadas
+		} = req.body;
+
+		const user = await userSchema.findById(id);
+		if (!user) {
+			return res.status(404).json({ message: "Usuário não encontrado." });
+		}
+
+		if (name) user.name = name;
+		if (email) user.email = email;
+		if (biography) user.biography = biography;
+		if (linkedin) user.linkedin = linkedin;
+		if (github) user.github = github;
+		if (avatarUrl) user.avatarUrl = avatarUrl;
+		if (skills) user.skills = skills;
+		if (hobbies) user.hobbies = hobbies;
+
+		if (badges && Array.isArray(badges)) {
+			for (const badge of badges) {
+				const alreadyExists = user.badges.some(
+					(b) => b.badgeId === badge.badgeId,
+				);
+				if (!alreadyExists) {
+					user.badges.push({
+						badgeId: badge.badgeId,
+						earnedAt: badge.earnedAt || new Date(),
+					});
+				}
+			}
+		}
+
+		if (password) {
+			const hashedPassword = await hash(password, 10);
+			user.password = hashedPassword;
+		}
+
+		await user.save();
+
+		res.status(200).json({ message: "Usuário atualizado com sucesso!", user });
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "Erro inesperado";
 		res.status(500).json({ status: "error", message });
 	}
 }

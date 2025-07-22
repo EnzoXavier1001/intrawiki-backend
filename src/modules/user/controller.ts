@@ -1,4 +1,10 @@
-import { createUser, getAllUsers, getUser, authUser } from "./service";
+import {
+	createUser,
+	getAllUsers,
+	getUser,
+	authUser,
+	updateUser,
+} from "./service";
 import type { Request, Response } from "express";
 
 class userController {
@@ -17,6 +23,10 @@ class userController {
 
 	async auth(req: Request, res: Response) {
 		await authUser(req, res);
+	}
+
+	async update(req: Request, res: Response) {
+		await updateUser(req, res);
 	}
 }
 

@@ -35,6 +35,12 @@ const userModel = new Schema(
 		linkedin: { type: String },
 		github: { type: String },
 		skills: [{ type: String }],
+		badges: [
+			{
+				badgeId: { type: String, required: true },
+				earnedAt: { type: Date, default: Date.now },
+			},
+		],
 		hobbies: [
 			{
 				type: String,
