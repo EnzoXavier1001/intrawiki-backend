@@ -42,11 +42,14 @@ export async function createPost(req: Request, res: Response) {
 
 export async function getAllPosts(res: Response) {
 	try {
-		const posts = await postSchema.find();
+		const posts = await postSchema
+			.find()
+			.sort({ createdAt: -1 })
+			.populate("author", "name email avatarUrl _id");
+
 		return res.status(200).json(posts);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Erro inesperado";
-
 		return res.status(500).json({ status: "error", message });
 	}
 }
@@ -60,7 +63,9 @@ export async function getPostById(req: Request, res: Response) {
 			throw new Error("Post não localizado no sistema");
 		}
 
-		const post = await postSchema.findByIdAndUpdate(id, {});
+		const post = await postSchema
+			.findById(id)
+			.populate("author", "name email avatarUrl _id");
 
 		return res.status(200).json(post);
 	} catch (error) {
@@ -114,6 +119,32 @@ export async function deletePostById(req: Request, res: Response) {
 	} catch (error) {
 		const message = error instanceof Error ? error.message : "Erro inesperado";
 
+		return res.status(500).json({ status: "error", message });
+	}
+}
+
+export async function searchPosts(req: Request, res: Response) {
+	try {
+		const { title } = req.query;
+
+		if (!title) {
+			return res
+				.status(400)
+				.json({ status: "error", message: "Post não encontrado" });
+		}
+
+		const posts = await postSchema.find({ title });
+
+		if (!posts || posts.length === 0) {
+			return res.status(404).json({
+				status: "error",
+				message: "Nenhum post encontrado para esse usuário",
+			});
+		}
+
+		return res.status(200).json(posts);
+	} catch (error) {
+		const message = error instanceof Error ? error.message : "Erro inesperado";
 		return res.status(500).json({ status: "error", message });
 	}
 }
