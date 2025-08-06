@@ -47,10 +47,6 @@ export async function createUser(req: Request, res: Response) {
 	}
 }
 
-import type { Request, Response } from "express";
-import { hash } from "bcrypt";
-import { userSchema } from "./model";
-
 export async function updateUser(req: Request, res: Response) {
 	try {
 		const { id } = req.params;
@@ -136,27 +132,36 @@ export async function authUser(req: Request, res: Response) {
 		const userExist = await userSchema.findOne({ email });
 
 		if (!userExist) {
-			throw new Error("E-mail doesnt exist");
+			return res
+				.status(404)
+				.json({ status: "error", message: "E-mail não existe" });
 		}
 
 		const passwordMatch = await compare(password, userExist.password);
 
 		if (!passwordMatch) {
-			throw new Error("Senha inválida");
+			return res
+				.status(401)
+				.json({ status: "error", message: "Senha inválida" });
 		}
 
 		const secret = process.env.SECRET!;
-
 		const token = jwt.sign(
-			{
-				id: userExist._id,
-			},
-			secret,
-			// { expiresIn: "4h" },
+			{ id: userExist._id },
+			secret /*, { expiresIn: "4h" } */,
 		);
 
-		res.status(200).json({ msg: "Autenticação realizada com sucesso", token });
+		const { password: _, ...user } = userExist.toObject(); // remove senha do retorno
+
+		return res.status(200).json({
+			status: "success",
+			message: "Autenticação realizada com sucesso",
+			token,
+			user,
+		});
 	} catch (error) {
-		res.status(500).json({ status: "error", message: "Error fetching users." });
+		const message =
+			error instanceof Error ? error.message : "Erro ao autenticar";
+		return res.status(500).json({ status: "error", message });
 	}
 }
