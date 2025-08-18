@@ -125,22 +125,9 @@ export async function deletePostById(req: Request, res: Response) {
 
 export async function searchPosts(req: Request, res: Response) {
 	try {
-		const { title } = req.query;
+		const search = req.query;
 
-		if (!title) {
-			return res
-				.status(400)
-				.json({ status: "error", message: "Post não encontrado" });
-		}
-
-		const posts = await postSchema.find({ title });
-
-		if (!posts || posts.length === 0) {
-			return res.status(404).json({
-				status: "error",
-				message: "Nenhum post encontrado para esse usuário",
-			});
-		}
+		const posts = await postSchema.find(search);
 
 		return res.status(200).json(posts);
 	} catch (error) {
