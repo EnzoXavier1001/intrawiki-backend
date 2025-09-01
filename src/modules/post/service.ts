@@ -125,9 +125,19 @@ export async function deletePostById(req: Request, res: Response) {
 
 export async function searchPosts(req: Request, res: Response) {
 	try {
-		const search = req.query;
+		const { category, title } = req.query;
 
-		const posts = await postSchema.find(search);
+		const filters: any = {};
+
+		if (category) {
+			filters.category = category;
+		}
+
+		if (title) {
+			filters.title = { $regex: title, $options: "i" };
+		}
+
+		const posts = await postSchema.find(filters);
 
 		return res.status(200).json(posts);
 	} catch (error) {

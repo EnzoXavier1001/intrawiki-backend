@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { userRoutes } from "./modules/user";
 import { postRoutes } from "./modules/post";
+import { announcementsRoutes } from "./modules/announcements";
 
 import { config } from "dotenv";
 
@@ -12,5 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
+app.use("/posts", postRoutes);
+app.use("/announcements", announcementsRoutes);
 
 export { app };
